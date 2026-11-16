@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, Pop
     }
 
     private let monitor = MemoryMonitor()
+    private lazy var cleaningManager = CleaningManager()
     private var statusItem: NSStatusItem!
     private var popover: NSPopover?
     private var popoverVC: PopoverViewController?
@@ -63,6 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, Pop
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        cleaningManager.stopAll()
         idleTimer?.invalidate()
         popoverTimer?.invalidate()
         removeGlobalClickMonitor()
@@ -231,6 +233,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, Pop
 
         menu.addItem(.separator())
 
+        let cleanKeyboardItem = NSMenuItem(title: "Clean Keyboard", action: #selector(toggleCleanKeyboard), keyEquivalent: "")
+        cleanKeyboardItem.state = cleaningManager.isKeyboardCleaning ? .on : .off
+        cleanKeyboardItem.target = self
+        menu.addItem(cleanKeyboardItem)
+
+        let cleanScreenItem = NSMenuItem(title: "Clean Screen", action: #selector(toggleCleanScreen), keyEquivalent: "")
+        cleanScreenItem.state = cleaningManager.isScreenCleaning ? .on : .off
+        cleanScreenItem.target = self
+        menu.addItem(cleanScreenItem)
+
+        menu.addItem(.separator())
+
         let amItem = NSMenuItem(title: "Open Activity Monitor", action: #selector(openActivityMonitor), keyEquivalent: "")
         amItem.target = self
         menu.addItem(amItem)
@@ -265,6 +279,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, Pop
         } catch {
             NSLog("MemorySpy: failed to toggle launch at login: \(error.localizedDescription)")
         }
+    }
+
+    @objc private func toggleCleanKeyboard() {
+        popover?.performClose(nil)
+        cleaningManager.toggleKeyboardCleaning()
+    }
+
+    @objc private func toggleCleanScreen() {
+        popover?.performClose(nil)
+        cleaningManager.toggleScreenCleaning()
     }
 
     @objc private func openActivityMonitor() {

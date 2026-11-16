@@ -19,9 +19,11 @@ swiftc \
     -target arm64-apple-macosx15.0 \
     -module-cache-path "$MODULE_CACHE" \
     -framework AppKit \
+    -framework ApplicationServices \
     -framework ServiceManagement \
     "$ROOT_DIR/Sources/MemoryMonitor.swift" \
     "$ROOT_DIR/Sources/RingIconRenderer.swift" \
+    "$ROOT_DIR/Sources/CleaningTools.swift" \
     "$ROOT_DIR/Sources/PopoverViewController.swift" \
     "$ROOT_DIR/Sources/AppDelegate.swift" \
     "$ROOT_DIR/Sources/main.swift" \
